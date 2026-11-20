@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="km">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Animal Random Race By SOTHUN</title>
+<style>
+:root{--green:#9be18e;--sky:#bfeaf4;--ink:#263238}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font-family:system-ui,"Noto Sans Khmer",sans-serif;background:#d9f0d6}
+header{background:linear-gradient(110deg,#86d77e,#b8eb9e);padding:12px 16px;text-align:center}
+h1{font-size:clamp(1.2rem,3vw,1.8rem);margin:0}
+header p{margin:3px 0 0;font-size:.88rem}
+main{max-width:1450px;margin:auto;padding:10px}
+.panel{background:#ffffffed;border:1px solid #d4e6d7;border-radius:14px;padding:11px;margin-bottom:10px;box-shadow:0 3px 12px #345c3b18}
+h2{font-size:1.02rem;margin:0 0 7px}
+.controls{display:flex;flex-wrap:wrap;gap:7px;align-items:center}\nselect{font:inherit;padding:8px 10px;border:1px solid #aebcaf;border-radius:9px;background:#fff;color:#263238}
+button{border:0;border-radius:9px;padding:8px 12px;background:#267b52;color:white;font:inherit;font-weight:700;cursor:pointer}
+button.alt{background:#536c7a}button.warn{background:#c87a25}button:disabled{opacity:.5;cursor:not-allowed}
+textarea{width:100%;min-height:65px;padding:8px;border:1px solid #b9cbbd;border-radius:9px;font:inherit}
+.timebox{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+.clock{font-size:clamp(2.3rem,6vw,4rem);font-weight:850;font-variant-numeric:tabular-nums;background:#f8fff4;border:3px solid #7dbb78;border-radius:13px;padding:0 14px;min-width:200px;text-align:center}
+.timeinputs{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.timeinputs input{width:65px;padding:7px;border:1px solid #aebcaf;border-radius:8px;font:inherit;text-align:center}
+.muted{font-size:.82rem;color:#52655a}
+.stage{position:relative;min-height:450px;height:min(62vh,650px);overflow:hidden;border-radius:15px;border:3px solid #8bc7d4;background:linear-gradient(#b7e9f4 0 60%,#77c7df 60% 100%);isolation:isolate}
+.stage:before{content:"";position:absolute;inset:60% 0 0;background:repeating-linear-gradient(170deg,#75c5dc 0 18px,#8ad4e3 18px 35px);opacity:.85}
+.stage:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 15% 12%,#fff9 0 4%,transparent 4.5%),radial-gradient(ellipse at 80% 20%,#fff8 0 5%,transparent 5.5%);pointer-events:none}
+.finish{position:absolute;right:10px;top:0;bottom:0;width:12px;border-left:4px dashed #df574b;z-index:1;opacity:.9}
+.animal{position:absolute;left:0;top:0;display:flex;align-items:center;gap:4px;max-width:min(260px,48%);padding:3px 8px 3px 4px;border:2px solid #fff;border-radius:22px;background:#fffdf0eF;box-shadow:0 2px 7px #2344;font-size:clamp(.77rem,1.3vw,.95rem);font-weight:750;white-space:nowrap;transform:translate(-50%,-50%);z-index:2;transition:filter .2s}
+.animal .face{font-size:clamp(25px,3.5vw,39px);line-height:1}
+.animal .student{overflow:hidden;text-overflow:ellipsis;max-width:145px}
+.animal .remove{padding:1px 5px;margin-left:2px;border-radius:50%;background:#d9534f;color:#fff;font-size:12px;line-height:1.4}
+.animal.winner{border-color:#f0a91c;background:#fff1a8;box-shadow:0 0 0 4px #ffd54f88,0 3px 12px #63480066;z-index:5}
+.animal.winner:after{content:"🏆";position:absolute;top:-19px;right:-5px;font-size:20px}
+.stage-message{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:4;background:#ffffffd9;padding:5px 12px;border-radius:20px;font-weight:800;white-space:nowrap}
+.result{font-weight:800;color:#925b08;text-align:center;min-height:35px;padding:7px;font-size:1.05rem}
+.options{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+label{font-size:.9rem}
+@keyframes bob{0%,100%{margin-top:0}50%{margin-top:-7px}}
+.animal.moving{animation:bob .45s ease-in-out infinite}
+@media(max-width:700px){main{padding:7px}.stage{height:58vh;min-height:390px}.animal .student{max-width:95px}.animal{max-width:55%;padding:2px 5px 2px 3px}.stage-message{font-size:.82rem;top:7px}}
+@media(prefers-reduced-motion:reduce){.animal.moving{animation:none}}
+</style></head>
+<body>
+<header><h1>🦆🐥🐰 Animal Random Race 🐢🐸</h1></header>
+<main>
+<section class="panel">
+<h2>១. បញ្ចូលឈ្មោះសិស្ស</h2>
+<textarea id="names" placeholder="សរសេរឈ្មោះសិស្សម្នាក់ក្នុងមួយបន្ទាត់ (ឈ្មោះអាចមានចន្លោះ) ហើយជ្រើសរើសប្រភេទសត្វមុនចុចបង្កើត&#10;ឧទាហរណ៍៖ សុខា&#10;សុភា&#10;ដារ៉ា"></textarea>
+<div class="controls" style="margin-top:7px">
+<label for="animalType"><b>ជ្រើសរើសសត្វ៖</b></label>
+<select id="animalType">
+<option value="mix">🎲 ច្របល់សត្វច្រើនប្រភេទ</option>
+<option value="🦆">🦆 ទា</option>
+<option value="🐥">🐥 កូនទា</option>
+<option value="🐤">🐤 កូនមាន់</option>
+<option value="🐰">🐰 ទន្សាយ</option>
+<option value="🐢">🐢 អណ្តើក</option>
+<option value="🐸">🐸 កង្កែប</option>
+<option value="🐼">🐼 ខ្លាឃ្មុំផេនដា</option>
+<option value="🐱">🐱 ឆ្មា</option>
+<option value="🐶">🐶 ឆ្កែ</option>
+<option value="🦊">🦊 កញ្ជ្រោង</option>
+<option value="🐻">🐻 ខ្លាឃ្មុំ</option>
+<option value="🐨">🐨 ខ្លាឃ្មុំកូអាឡា</option>
+<option value="🐵">🐵 ស្វា</option>
+<option value="🐷">🐷 ជ្រូក</option>
+<option value="🐮">🐮 គោ</option>
+<option value="🐙">🐙 រតីយាវហឺ</option>
+<option value="🦋">🦋 មេអំបៅ</option>
+<option value="🐝">🐝 ឃ្មុំ</option>
+<option value="🐧">🐧 ភេនឃ្វីន</option>
+<option value="🦉">🦉 សត្វទីទុយ</option>
+</select>
+<button id="make">➕ បន្ថែមសត្វថ្មី</button><button class="warn" id="mix">ច្របល់ឈ្មោះ</button><button class="alt" id="clear">សម្អាត</button><span id="total" class="muted">សិស្ស ០ នាក់</span></div>
+</section>
+<section class="panel">
+<h2>២. កំណត់ពេលវេលា</h2>
+<div class="timebox">
+<div class="clock" id="clock">00:30</div>
+<div>
+<div class="timeinputs"><label>នាទី <input id="mins" type="number" min="0" max="180" value="0"></label><label>វិនាទី <input id="secs" type="number" min="1" max="59" value="30"></label></div>
+<div class="controls" style="margin-top:8px"><button id="go">▶ ចាប់ផ្ដើម</button><button class="alt" id="pause">⏸ ផ្អាក</button><button class="warn" id="resetTime">↻ កំណត់ឡើងវិញ</button></div>
+</div>
+<div class="options"><label><input id="sound" type="checkbox" checked> បើកសំឡេង</label><label>កម្រិត <input id="vol" type="range" min="0" max="100" value="45"></label></div>
+</div>
+<!-- <p class="muted">អ្នកអាចកំណត់នាទី និងវិនាទី។ នៅពេល Timer ដល់សូន្យ សត្វនឹងឈប់ ហើយកម្មវិធីជ្រើសរើសឈ្មោះម្នាក់ដោយចៃដន្យ។</p> -->
+</section>
+<section class="panel">
+<div class="controls" style="justify-content:space-between"><h2 style="margin:0">៣. ទីលានប្រណាំងច្របល់</h2><span class="muted">ចលនាសត្វជាច្រើនក្នុងទីលាន</span></div>
+<div class="stage" id="stage"><div class="finish"></div><div class="stage-message" id="stageMsg">ត្រៀមប្រណាំង!</div><div class="muted" style="position:absolute;left:12px;bottom:8px;z-index:2;color:#174f63">START</div><div class="muted" style="position:absolute;right:24px;bottom:8px;z-index:2;color:#174f63">FINISH</div></div>
+<div class="result" id="result" aria-live="polite">បញ្ចូលឈ្មោះសិស្ស រួចចុចចាប់ផ្ដើម។</div>
+<div class="controls"><button id="pick" class="warn">🎲 ចាប់ឈ្មោះចៃដន្យឥឡូវនេះ</button><button id="resetRace" class="alt">កំណត់ទីលានឡើងវិញ</button></div>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const animals=['🦆','🐥','🐤','🐰','🐢','🐸','🐼','🐱','🐶','🦊','🐻','🐨','🐵','🐷','🐮','🐙','🦋','🐝','🐧','🦉'];
+let entries=[],remaining=30,interval=null,raf=null,lastTick=0,running=false,ctx=null,nextId=1;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function duration(){let m=clamp(parseInt($('mins').value)||0,0,180),s=clamp(parseInt($('secs').value)||0,0,59);$('mins').value=m;$('secs').value=s;return m*60+s}
+function fmt(n){return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')}
+function showClock(){$('clock').textContent=fmt(remaining)}
+function sound(f=650,d=.18,delay=0){if(!$('sound').checked||+$('vol').value===0)return;try{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();let o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime+delay;o.frequency.value=f;g.gain.setValueAtTime(+$('vol').value/100*.12,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+d)}catch(e){}}
+function fanfare(){[523,659,784,988,1175].forEach((f,i)=>sound(f,.22,i*.16))}
+function addEntries(names,type){
+ names.forEach(name=>{
+  const el=document.createElement('div');el.className='animal';
+  const face=document.createElement('span');face.className='face';face.textContent=type==='mix'?animals[Math.floor(Math.random()*animals.length)]:type;
+  const label=document.createElement('span');label.className='student';label.textContent=name;
+  const remove=document.createElement('button');remove.className='remove';remove.type='button';remove.title='លុបសត្វនេះ';remove.textContent='×';
+  const entry={id:nextId++,name,index:entries.length,el,x:Math.random()*78+8,y:Math.random()*68+20,vx:(Math.random()-.5)*.34,vy:(Math.random()-.5)*.3,phase:Math.random()*6};
+  remove.onclick=(ev)=>{ev.stopPropagation();removeEntry(entry.id)};
+  el.append(face,label,remove);$('stage').append(el);entries.push(entry);
+ });updateLabels();placeEntries();
+}
+function updateLabels(){entries.forEach((e,i)=>{e.index=i;e.el.querySelector('.student').textContent=(i+1)+'. '+e.name});$('total').textContent='សិស្ស '+entries.length+' នាក់'}
+function removeEntry(id){const e=entries.find(x=>x.id===id);if(!e)return;e.el.remove();entries=entries.filter(x=>x.id!==id);updateLabels();if(!entries.length){stopTimer();stopMotion();$('stageMsg').textContent='ត្រៀមប្រណាំង!';$('result').textContent='សូមបញ្ចូលឈ្មោះសិស្សជាមុន។'}else{$('result').textContent='បានលុបសត្វមួយ — សត្វផ្សេងៗនៅដដែល។'}}
+function placeEntries(){entries.forEach(e=>{e.x=clamp(e.x,5,90);e.y=clamp(e.y,12,88);e.el.style.left=e.x+'%';e.el.style.top=e.y+'%'})}
+function render(){updateLabels();$('result').textContent=entries.length?'រួចរាល់ — កំណត់ម៉ោង រួចចាប់ផ្ដើម!':'សូមបញ្ចូលឈ្មោះសិស្សជាមុន។'}
+function stopMotion(){running=false;if(raf)cancelAnimationFrame(raf);raf=null;entries.forEach(e=>e.el.classList.remove('moving'))}
+function moveFrame(t){if(!running)return;let dt=Math.min(32,t-lastTick||16);lastTick=t;let w=$('stage').clientWidth,h=$('stage').clientHeight;entries.forEach(e=>{e.phase+=dt*.004;e.x+=e.vx*dt*.055+Math.sin(e.phase)*.06;e.y+=e.vy*dt*.055+Math.cos(e.phase*1.3)*.045;if(e.x<4||e.x>91)e.vx*=-1;if(e.y<12||e.y>87)e.vy*=-1;e.x=clamp(e.x,4,91);e.y=clamp(e.y,12,87);e.el.style.left=e.x+'%';e.el.style.top=e.y+'%'});raf=requestAnimationFrame(moveFrame)}
+function startMotion(){running=true;lastTick=0;entries.forEach(e=>e.el.classList.add('moving'));raf=requestAnimationFrame(moveFrame)}
+function stopTimer(){if(interval){clearInterval(interval);interval=null}}
+function chooseWinner(){stopTimer();stopMotion();if(!entries.length)return;entries.forEach(e=>e.el.classList.remove('winner'));let winner=entries[Math.floor(Math.random()*entries.length)];winner.el.classList.add('winner');$('stageMsg').textContent='🏁 អស់ម៉ោងហើយ!';$('result').textContent='🏆 អ្នកត្រូវបានជ្រើសរើស៖ លេខ '+(winner.index+1)+' — '+winner.name+'!';$('go').disabled=false;fanfare()}
+function startGame(){if(running||!entries.length)return;if(remaining<=0)remaining=duration();if(remaining<=0){alert('សូមកំណត់ពេលវេលាឱ្យលើសពី ០ វិនាទី។');return}entries.forEach(e=>e.el.classList.remove('winner'));$('result').textContent='សត្វកំពុងប្រណាំង...';$('stageMsg').textContent='🏁 កំពុងប្រណាំង!';$('go').disabled=true;startMotion();sound(600,.12);interval=setInterval(()=>{remaining--;showClock();if(remaining<=0){remaining=0;showClock();chooseWinner()}},1000)}
+$('make').onclick=()=>{const newNames=$('names').value.split(/\r?\n/).map(x=>x.trim()).map(x=>x.replace(/^(?:[🦆🐥🐤🐰🐢🐸🐼🐱🐶🦊🐻🐨🐵🐷🐮🐙🦋🐝🐧🦉]\s*)?(?:(?:\d+|[០-៩]+)[.)៖-]?\s*)?(?:[-•*]\s*)?/, '')).map(x=>x.trim()).filter(Boolean);if(!newNames.length){alert('សូមបញ្ចូលឈ្មោះសិស្សជាមុន។');return;}addEntries(newNames,$('animalType').value);$('names').value='';$('stageMsg').textContent='ត្រៀមប្រណាំង!';$('result').textContent='បានបន្ថែម '+newNames.length+' សត្វថ្មី។ សត្វចាស់នៅដដែល។';sound(550,.12)};
+$('mix').onclick=()=>{for(let i=entries.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[entries[i],entries[j]]=[entries[j],entries[i]]}updateLabels();sound(740,.14)};
+$('clear').onclick=()=>{$('names').value='';stopTimer();stopMotion();entries.forEach(e=>e.el.remove());entries=[];updateLabels();render();$('stageMsg').textContent='ត្រៀមប្រណាំង!'};
+$('go').onclick=startGame;
+$('pause').onclick=()=>{stopTimer();stopMotion();$('go').disabled=false;$('stageMsg').textContent='បានផ្អាក';$('result').textContent='ការប្រណាំងត្រូវបានផ្អាក។ ចុចចាប់ផ្ដើមដើម្បីបន្ត។';sound(440,.12)};
+$('resetTime').onclick=()=>{stopTimer();stopMotion();remaining=duration();showClock();$('go').disabled=false;$('stageMsg').textContent='ត្រៀមប្រណាំង!';entries.forEach(e=>e.el.classList.remove('winner'));$('result').textContent='កំណត់ម៉ោងរួចរាល់។'};
+$('pick').onclick=()=>{if(running){stopTimer();stopMotion()}chooseWinner()};
+$('resetRace').onclick=()=>{stopTimer();stopMotion();remaining=duration();showClock();$('go').disabled=false;entries.forEach(e=>e.el.classList.remove('winner'));entries.forEach(e=>{e.x=Math.random()*78+8;e.y=Math.random()*68+20;e.vx=(Math.random()-.5)*.34;e.vy=(Math.random()-.5)*.3});placeEntries();$('stageMsg').textContent='ត្រៀមប្រណាំង!';$('result').textContent='ទីលានត្រូវបានកំណត់ឡើងវិញ។'};
+['mins','secs'].forEach(id=>$(id).addEventListener('change',()=>{if(!running){remaining=duration();showClock()}}));
+window.addEventListener('resize',placeEntries);
+remaining=duration();showClock();
+</script></body></html>
